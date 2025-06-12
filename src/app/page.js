@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function SearchPage() {
   const [searchFile, setSearchFile] = useState(null);
@@ -39,7 +40,7 @@ export default function SearchPage() {
         URL.revokeObjectURL(previewImage);
       }
     };
-  }, []);
+  }, [previewImage]);
 
   // New useEffect to handle camera stream when isCameraOpen changes
   useEffect(() => {
@@ -75,12 +76,14 @@ export default function SearchPage() {
 
     // Cleanup function for this specific effect
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      const stream = streamRef.current;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = null;
       }
     };
   }, [isCameraOpen]);

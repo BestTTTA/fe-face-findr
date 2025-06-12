@@ -174,7 +174,7 @@ export default function UploadPage() {
       <button
         onClick={handleUploadToDatabase}
         disabled={uploadFilesToDb.length === 0 || isUploadingToDb}
-        className="w-full bg-primary-DEFAULT hover:bg-primary-dark disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-lg shadow-md font-heading"
+        className="w-full bg-primary-dark hover:bg-primary-light disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-lg shadow-md font-heading"
       >
         {isUploadingToDb ? 'กำลังอัปโหลด...' : `อัปโหลด ${uploadFilesToDb.length > 0 ? uploadFilesToDb.length : ''} รูปเข้าฐานข้อมูล`}
       </button>

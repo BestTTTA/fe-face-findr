@@ -1,6 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
 const BASE_IMAGE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
@@ -8,7 +9,6 @@ const ImagePreviewModal = ({ isOpen, onClose, imageUrls, currentIndex, onNavigat
   if (!isOpen || !imageUrls || imageUrls.length === 0) return null;
 
   const currentImageUrl = imageUrls?.[currentIndex]?.image_url;
-  const imageName = currentImageUrl ? currentImageUrl.split('/').pop() : 'image';
 
   const handlePrev = () => {
     onNavigate(currentIndex - 1);
@@ -19,15 +19,22 @@ const ImagePreviewModal = ({ isOpen, onClose, imageUrls, currentIndex, onNavigat
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg p-8 max-w-4xl max-h-[90vh] overflow-auto relative">
+    <div className="fixed top-0 left-0 w-full h-full bg-opacity-80 z-50 flex justify-center items-center">
+      <div className="bg-white bg-opacity-80 rounded-lg p-8 w-full max-h-[90vh] overflow-auto relative">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         {currentImageUrl ? (
-          <img src={`${BASE_IMAGE_URL}${currentImageUrl}`} alt={`Preview`} className="w-full rounded-lg shadow-md mb-4" />
+          <div className="relative w-full h-[60vh]">
+            <Image
+              src={`${BASE_IMAGE_URL}${currentImageUrl}`}
+              alt="Preview"
+              fill
+              className="object-contain rounded-lg shadow-md mb-4"
+            />
+          </div>
         ) : (
           <div className="text-center text-gray-500 py-20">ไม่พบรูปภาพ</div>
         )}
@@ -60,7 +67,7 @@ const ImagePreviewModal = ({ isOpen, onClose, imageUrls, currentIndex, onNavigat
   );
 };
 
-export default function ResultsPage() {
+function ResultsContent() {
   const searchParams = useSearchParams();
   const [searchProcessedResults, setSearchProcessedResults] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -122,7 +129,7 @@ export default function ResultsPage() {
           if (index === searchProcessedResults.matches.partial_matches.length - 1) {
             setIsDownloadingAll(false);
           }
-        }, index * 500); // Add a small delay to avoid overwhelming the browser
+        }, index * 500); 
       });
     }
   };
@@ -137,11 +144,14 @@ export default function ResultsPage() {
           {matches.map((res, i) => (
             <div key={i} className="border border-gray-200 rounded-lg p-4 shadow-md bg-white flex flex-col items-center text-center cursor-pointer" onClick={() => handleImageClick(i)}>
               {res.image_url && (
-                <img
-                  src={`${BASE_IMAGE_URL}${res.image_url}`}
-                  alt={`Match ${i + 1}`}
-                  className="w-full h-48 object-cover rounded-lg mb-3 shadow-sm"
-                />
+                <div className="relative w-full h-48">
+                  <Image
+                    src={`${BASE_IMAGE_URL}${res.image_url}`}
+                    alt={`Match ${i + 1}`}
+                    fill
+                    className="object-cover rounded-lg mb-3 shadow-sm"
+                  />
+                </div>
               )}
             </div>
           ))}
@@ -217,5 +227,17 @@ export default function ResultsPage() {
         onDownload={downloadImage}
       />
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg text-center text-gray-600">
+        กำลังโหลดผลลัพธ์การค้นหา...
+      </div>
+    }>
+      <ResultsContent />
+    </Suspense>
   );
 }
