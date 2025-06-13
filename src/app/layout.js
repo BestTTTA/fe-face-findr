@@ -10,7 +10,7 @@ export const metadata = {
   title: 'FaceFindr App',
   description: 'Search for your faces.',
   openGraph: {
-    images: 'https://img5.pic.in.th/file/secure-sv1/490975309_4031757217040578_1587258288662906038_n.th.jpg',
+    images: 'https://img2.pic.in.th/pic/face-id-1.th.png',
   },
 };
 
