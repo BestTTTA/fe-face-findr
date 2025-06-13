@@ -8,6 +8,11 @@ const nextConfig = {
         port: '8000',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'facefindr.api.thetigerteamacademy.net',
+        pathname: '/**',
+      },
     ],
   },
 };

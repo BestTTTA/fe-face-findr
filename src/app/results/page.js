@@ -29,7 +29,7 @@ const ImagePreviewModal = ({ isOpen, onClose, imageUrls, currentIndex, onNavigat
         {currentImageUrl ? (
           <div className="relative w-full h-[60vh]">
             <Image
-              src={`${BASE_IMAGE_URL}${currentImageUrl}`}
+              src={currentImageUrl}
               alt="Preview"
               fill
               className="object-contain rounded-lg shadow-md mb-4"
@@ -109,14 +109,29 @@ function ResultsContent() {
     }
   };
 
-  const downloadImage = (imageUrl) => {
+  const downloadImage = async (imageUrl) => {
     if (imageUrl) {
-      const link = document.createElement('a');
-      link.href = `${BASE_IMAGE_URL}${imageUrl}`;
-      link.download = imageUrl.split('/').pop();
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        // Fetch the image
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        
+        // Create a blob URL
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        // Create and trigger download link
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = imageUrl.split('/').pop();
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        console.error('Error downloading image:', error);
+      }
     }
   };
 
@@ -146,7 +161,7 @@ function ResultsContent() {
               {res.image_url && (
                 <div className="relative w-full h-48">
                   <Image
-                    src={`${BASE_IMAGE_URL}${res.image_url}`}
+                    src={res.image_url}
                     alt={`Match ${i + 1}`}
                     fill
                     className="object-cover rounded-lg mb-3 shadow-sm"
