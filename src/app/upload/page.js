@@ -10,6 +10,9 @@ export default function UploadPage() {
   const [isUploadingToDb, setIsUploadingToDb] = useState(false);
   const [dbStats, setDbStats] = useState(null);
   const MAX_FILES = 1000; // Maximum number of files allowed
+  const [uploadProgress, setUploadProgress] = useState({});
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const [showProgressDetails, setShowProgressDetails] = useState(true);
 
   // State for password protection
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(true); // Modal is open by default
@@ -55,14 +58,22 @@ export default function UploadPage() {
     let successfulUploads = 0;
     let failedUploads = 0;
 
-    const uploadPromises = uploadFilesToDb.map(async (file) => {
+    const uploadPromises = uploadFilesToDb.map(async (file, index) => {
       const formData = new FormData();
       formData.append('file', file);
 
       try {
+        setCurrentFileIndex(index);
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_API}/upload-to-db`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(prev => ({
+              ...prev,
+              [file.name]: percentCompleted
+            }));
           },
         });
 
@@ -190,6 +201,39 @@ export default function UploadPage() {
         <p className={`mt-4 text-md font-medium text-center ${uploadDbMessage.startsWith('❌') ? 'text-danger-DEFAULT' : (uploadDbMessage.startsWith('⚠️') ? 'text-accent-dark' : 'text-secondary-dark')}`}>
           {uploadDbMessage}
         </p>
+      )}
+
+      {isUploadingToDb && uploadFilesToDb.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-sm text-gray-600">
+              กำลังอัปโหลดไฟล์ {currentFileIndex + 1} จาก {uploadFilesToDb.length}
+            </p>
+            <button
+              onClick={() => setShowProgressDetails(!showProgressDetails)}
+              className="text-sm text-primary-dark hover:text-primary-light transition-colors"
+            >
+              {showProgressDetails ? 'ซ่อนรายละเอียด' : 'แสดงรายละเอียด'}
+            </button>
+          </div>
+          {showProgressDetails && Object.entries(uploadProgress).map(([filename, progress]) => (
+            <div key={filename} className="w-full">
+              <div className="flex justify-between text-xs text-gray-600 mb-1">
+                <span className="truncate max-w-[60%]">{filename}</span>
+                <div className="flex items-center gap-2">
+                  <span>{progress}%</span>
+                  <span className="text-gray-500 whitespace-nowrap">{new Date().toLocaleTimeString()}</span>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-primary-dark h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {dbStats && (
