@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Define the hardcoded password
 const HARDCODED_PASSWORD = process.env.NEXT_PUBLIC_HARDCODED_PASSWORD
 
 export default function UploadPage() {
@@ -10,6 +9,7 @@ export default function UploadPage() {
   const [uploadDbMessage, setUploadDbMessage] = useState('');
   const [isUploadingToDb, setIsUploadingToDb] = useState(false);
   const [dbStats, setDbStats] = useState(null);
+  const MAX_FILES = 1000; // Maximum number of files allowed
 
   // State for password protection
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(true); // Modal is open by default
@@ -159,8 +159,15 @@ export default function UploadPage() {
           accept="image/jpeg,image/jpg,image/png"
           multiple
           onChange={(e) => {
-            setUploadFilesToDb(Array.from(e.target.files || []));
-            setUploadDbMessage(''); // Clear message when new files are selected
+            const files = Array.from(e.target.files || []);
+            if (files.length > MAX_FILES) {
+              setUploadDbMessage(`❌ จำนวนไฟล์เกินกว่าที่กำหนด (สูงสุด ${MAX_FILES} ไฟล์)`);
+              setUploadFilesToDb([]);
+              e.target.value = ''; // Clear the input
+            } else {
+              setUploadFilesToDb(files);
+              setUploadDbMessage(''); // Clear message when new files are selected
+            }
           }}
           className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary-light file:text-white hover:file:bg-secondary-DEFAULT cursor-pointer transition-colors duration-200"
         />
