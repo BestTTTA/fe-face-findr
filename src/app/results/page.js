@@ -76,17 +76,27 @@ function ResultsContent() {
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
 
   useEffect(() => {
-    const resultsData = searchParams.get('data');
-    if (resultsData) {
-      try {
+    try {
+      // Try to get results from localStorage first
+      const storedResults = localStorage.getItem('searchResults');
+      if (storedResults) {
+        setSearchProcessedResults(JSON.parse(storedResults));
+        // Clear the stored results after retrieving them
+        localStorage.removeItem('searchResults');
+        return;
+      }
+
+      // Fallback to URL parameters if no stored results
+      const resultsData = searchParams.get('data');
+      if (resultsData) {
         const parsedResults = JSON.parse(decodeURIComponent(resultsData));
         setSearchProcessedResults(parsedResults);
-      } catch (error) {
-        console.error('Failed to parse search results:', error);
-        setErrorMessage('ไม่สามารถโหลดผลลัพธ์การค้นหาได้ กรุณาลองใหม่อีกครั้ง');
+      } else {
+        setErrorMessage('ไม่มีข้อมูลผลลัพธ์การค้นหา');
       }
-    } else {
-      setErrorMessage('ไม่มีข้อมูลผลลัพธ์การค้นหา');
+    } catch (error) {
+      console.error('Failed to parse search results:', error);
+      setErrorMessage('ไม่สามารถโหลดผลลัพธ์การค้นหาได้ กรุณาลองใหม่อีกครั้ง');
     }
   }, [searchParams]);
 

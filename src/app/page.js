@@ -168,8 +168,9 @@ export default function SearchPage() {
       });
 
       if (response.data.status === 'success') {
-        const results = encodeURIComponent(JSON.stringify(response.data.results));
-        router.push(`/results?data=${results}`);
+        // Store results in localStorage instead of URL
+        localStorage.setItem('searchResults', JSON.stringify(response.data.results));
+        router.push('/results');
       } else {
         setSearchMessage(`❌ ข้อผิดพลาด: ${response.data.message || 'เกิดข้อผิดพลาดที่ไม่รู้จักระหว่างการค้นหา'}`);
       }
