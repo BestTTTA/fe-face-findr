@@ -86,14 +86,6 @@ function ResultsContent() {
         return;
       }
 
-      // Fallback to URL parameters if no stored results
-      const resultsData = searchParams.get('data');
-      if (resultsData) {
-        const parsedResults = JSON.parse(decodeURIComponent(resultsData));
-        setSearchProcessedResults(parsedResults);
-      } else {
-        setErrorMessage('ไม่มีข้อมูลผลลัพธ์การค้นหา');
-      }
     } catch (error) {
       console.error('Failed to parse search results:', error);
       setErrorMessage('ไม่สามารถโหลดผลลัพธ์การค้นหาได้ กรุณาลองใหม่อีกครั้ง');
