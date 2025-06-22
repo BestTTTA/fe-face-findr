@@ -28,11 +28,11 @@ const ImagePreviewModal = ({ isOpen, onClose, imageUrls, currentIndex, onNavigat
         </button>
         {currentImageUrl ? (
           <div className="relative w-full h-[60vh]">
-            <Image
+            <img
               src={currentImageUrl}
               alt="Preview"
-              fill
-              className="object-contain rounded-lg shadow-md mb-4"
+              className="object-contain rounded-lg shadow-md mb-4 w-full h-full"
+              style={{ objectFit: 'contain', maxHeight: '60vh' }}
             />
           </div>
         ) : (
@@ -162,11 +162,11 @@ function ResultsContent() {
             <div key={i} className="border border-gray-200 rounded-lg p-4 shadow-md bg-white flex flex-col items-center text-center cursor-pointer" onClick={() => handleImageClick(i)}>
               {res.image_url && (
                 <div className="relative w-full h-48">
-                  <Image
+                  <img
                     src={res.image_url}
                     alt={`Match ${i + 1}`}
-                    fill
-                    className="object-cover rounded-lg mb-3 shadow-sm"
+                    className="object-cover rounded-lg mb-3 shadow-sm w-full h-48"
+                    style={{ objectFit: 'cover' }}
                   />
                 </div>
               )}
