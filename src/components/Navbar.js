@@ -12,8 +12,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo and Site Title */}
         <Link href="/" className="text-white flex items-center gap-2 text-2xl font-bold font-heading">
-          <Image src="/logo/logo-white.png" height={60} alt='Facefidr Logo' width={60}/>
-          Facefidr
+          <Image src="/logo/logo-white.png" height={60} alt='Facefindr Logo' width={60}/>
+          Facefindr
         </Link>
 
         {/* Hamburger menu button for mobile */}
